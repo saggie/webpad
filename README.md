@@ -1,2 +1,2 @@
 # webpad
-Free online notepad
+Online notepad working on Heroku.
