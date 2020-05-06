@@ -122,6 +122,8 @@ const __deleteArticle = (id, res) => {
     const sql = util.format('DELETE FROM %s WHERE id = $1', tableName);
     const values = [id];
 
+    console.log('SQL: ' + sql + ', ID: ' + id);
+
     client.query(sql, values, (err, _) => {
       done();
       if (err) {
