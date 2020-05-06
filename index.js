@@ -57,6 +57,7 @@ const __listIds = (res) => {
 const __getArticle = (id, res) => {
   pool.connect((err, client, done) => {
     if (err) {
+      done();
       return __handlePgError(res, err, 'acquiring client');
     }
 
@@ -82,6 +83,7 @@ const __getArticle = (id, res) => {
 const __addArticle = (id, text, res) => {
   pool.connect((err, client, done) => {
     if (err) {
+      done();
       return __handlePgError(res, err, 'acquiring client');
     }
 
@@ -106,6 +108,26 @@ const __addArticle = (id, text, res) => {
         }
         __okOrNot(res, true);
       });
+    });
+  });
+};
+
+const __deleteArticle = (id, res) => {
+  pool.connect((err, client, done) => {
+    if (err) {
+      done();
+      return __handlePgError(res, err, 'acquiring client');
+    }
+
+    const sql = util.format('DELETE FROM %s WHERE id = $1', tableName);
+    const values = [id];
+
+    client.query(sql, values, (err, _) => {
+      done();
+      if (err) {
+        return __handlePgError(res, err, 'executing query');
+      }
+      __okOrNot(res, true);
     });
   });
 };
@@ -142,6 +164,10 @@ const startApp = (() => {
 
   app.post('/__articles/:id', __parseText, (req, res) => {
     __addArticle(req.params.id, req.text, res);
+  });
+
+  app.delete('/__articles/:id', (req, res) => {
+    __deleteArticle(req.params.id, res);
   });
 
   app.get('/*', (_, res) => {
